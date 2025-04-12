@@ -58,7 +58,7 @@ async function serveFrontend() {
                 </span>
             </h1>
             <p class="text-gray-600 text-lg mb-4">简单、安全的链接缩短服务</p>
-            <a href="https://github.com/iTaoPu/CloudflareWorker-KV-UrlShort" 
+            <a href="https://github.com/iTCoffe/CloudflareWorker-KV-UrlShort" 
                target="_blank" 
                class="inline-flex items-center px-4 py-2 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors">
                 <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
