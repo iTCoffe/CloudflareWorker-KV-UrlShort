@@ -72,3 +72,7 @@ MIT License
 
 ## 感谢
 感谢[Cloudflare](https://www.cloudflare.com)提供平台和服务。
+
+<p align="center">
+  <img src="https://iTaoPu.Github.io/言家稗子-标准色版.png" alt="微信公眾號" />
+</p>
