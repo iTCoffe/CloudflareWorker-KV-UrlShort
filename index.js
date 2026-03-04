@@ -1,6 +1,6 @@
 // Cloudflare Worker
-// 使用 Cloudflare KV 存储短链接数据
-// 绑定变量：URL_SHORT_KV, TURNSTILE_SITE_KEY, TURNSTILE_SECRET
+// 使用 Cloudflare KV 存儲短鏈接數據
+// 綁定變量：URL_SHORT_KV, TURNSTILE_SITE_KEY, TURNSTILE_SECRET
 
 addEventListener("fetch", (event) => {
   event.respondWith(handleRequest(event.request));
@@ -30,7 +30,7 @@ async function handleRequest(request) {
     return handleRedirect(pathname);
   } catch (error) {
     console.error('Error handling request:', error);
-    return new Response('服务器内部错误', { status: 500 });
+    return new Response('伺服器內部錯誤', { status: 500 });
   }
 }
 
@@ -44,7 +44,7 @@ async function serveFrontend() {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>短链接生成器</title>
+    <title>簡約短網址服務</title>
     <link href="https://fastly.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔗</text></svg>">
     ${turnstileScript}
@@ -55,16 +55,16 @@ async function serveFrontend() {
             <h1 class="text-6xl font-extrabold mb-4">
                 <span class="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 
                 hover:from-purple-500 hover:via-indigo-500 hover:to-blue-500 transition-all duration-500">
-                    简约短链
+                    簡約短網址
                 </span>
             </h1>
-            <p class="text-gray-600 text-lg mb-4">简单、安全的链接缩短服务</p>
+            <p class="text-gray-600 text-lg mb-4">簡單、快速、安全的短網址服務</p>
             <a target="_blank" 
                class="inline-flex items-center px-4 py-2 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors">
                 <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"></path>
                 </svg>
-                赛博活佛部署项目
+                賽博活佛部署項目
             </a>
         </div>
         
@@ -73,7 +73,7 @@ async function serveFrontend() {
                 <div class="space-y-4">
                     <div>
                         <label for="url" class="block text-sm font-semibold text-gray-700 mb-2">
-                            输入链接
+                            輸入鏈接
                             <span class="text-gray-500 font-normal">（必填）</span>
                         </label>
                         <input id="url" type="url" 
@@ -84,26 +84,26 @@ async function serveFrontend() {
                     <div class="grid md:grid-cols-2 gap-4">
                         <div>
                             <label for="slug" class="block text-sm font-semibold text-gray-700 mb-2">
-                                自定义短链接
-                                <span class="text-gray-500 font-normal">（可选）</span>
+                                自訂短鏈接
+                                <span class="text-gray-500 font-normal">（可選）</span>
                             </label>
                             <input id="slug" type="text" 
                                 class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200" 
-                                placeholder="自定义链接">
+                                placeholder="自訂短鏈接">
                         </div>
                         <div>
                             <label for="expiry" class="block text-sm font-semibold text-gray-700 mb-2">
                                 有效期
-                                <span class="text-gray-500 font-normal">（可选）</span>
+                                <span class="text-gray-500 font-normal">（可選）</span>
                             </label>
                             <select id="expiry" 
                                 class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200">
                                 <option value="">永久有效</option>
-                                <option value="1h">1小时</option>
-                                <option value="24h">24小时</option>
+                                <option value="1h">1小時</option>
+                                <option value="24h">24小時</option>
                                 <option value="7d">7天</option>
                                 <option value="30d">30天</option>
-                                <option value="custom">自定义时间</option>
+                                <option value="custom">自訂時間</option>
                             </select>
                             <input id="customExpiry" type="datetime-local" 
                                 class="hidden w-full mt-2 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200">
@@ -113,17 +113,17 @@ async function serveFrontend() {
                     <div class="grid md:grid-cols-2 gap-4">
                         <div>
                             <label for="password" class="block text-sm font-semibold text-gray-700 mb-2">
-                                访问密码
-                                <span class="text-gray-500 font-normal">（可选）</span>
+                                訪問密碼
+                                <span class="text-gray-500 font-normal">（可選）</span>
                             </label>
                             <input id="password" type="password" 
                                 class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200" 
-                                placeholder="设置密码">
+                                placeholder="設定密碼">
                         </div>
                         <div>
                             <label for="maxVisits" class="block text-sm font-semibold text-gray-700 mb-2">
-                                最大访问次数
-                                <span class="text-gray-500 font-normal">（可选）</span>
+                                最大訪問次數
+                                <span class="text-gray-500 font-normal">（可選）</span>
                             </label>
                             <input id="maxVisits" type="number" 
                                 class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200" 
@@ -140,7 +140,7 @@ async function serveFrontend() {
                 
                 <button type="submit" 
                     class="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-3 px-6 rounded-lg font-medium hover:from-blue-600 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transform hover:-translate-y-0.5 transition duration-200">
-                    生成短链接
+                    生成短網址
                 </button>
             </form>
             
@@ -154,22 +154,22 @@ async function serveFrontend() {
       
       let token;
       try {
-        // 确保 turnstile 对象存在
+        // 確保 turnstile 物件存在
         token = typeof turnstile !== 'undefined' ? turnstile.getResponse() : null;
         if (TURNSTILE_SITE_KEY && !token) {
-          document.getElementById('result').innerHTML = \`<div class="p-4 bg-red-50 rounded-lg"><p class="text-red-800">请完成人机验证</p></div>\`;
+          document.getElementById('result').innerHTML = \`<div class="p-4 bg-red-50 rounded-lg"><p class="text-red-800">請完成人機驗證</p></div>\`;
           return;
         }
       } catch (error) {
         console.error('Turnstile error:', error);
-        document.getElementById('result').innerHTML = \`<div class="p-4 bg-red-50 rounded-lg"><p class="text-red-800">人机验证加载失败，请刷新页面重试</p></div>\`;
+        document.getElementById('result').innerHTML = \`<div class="p-4 bg-red-50 rounded-lg"><p class="text-red-800">人機驗證載入失敗，請重新整理頁面重試</p></div>\`;
         return;
       }
       
       const submitButton = e.target.querySelector('button[type="submit"]');
       const resultDiv = document.getElementById('result');
       
-      // 禁用提交按钮并显示加载状态
+      // 禁用提交按鈕並顯示載入狀態
       submitButton.disabled = true;
       submitButton.textContent = '生成中...';
       resultDiv.innerHTML = '';
@@ -194,10 +194,10 @@ async function serveFrontend() {
                     expiryDate = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
                     break;
                 case 'custom':
-                    // 将本地时间字符串转换为 ISO 字符串（包含时区偏移）
+                    // 將本地時間字串轉換為 ISO 字串（包含時區偏移）
                     const localDate = document.getElementById('customExpiry').value;
                     if (localDate) {
-                        // 构造本地时间的 Date 对象（注意：new Date(localDate) 会被解析为 UTC，所以需要手动处理）
+                        // 建構本地時間的 Date 物件（注意：new Date(localDate) 會被解析為 UTC，所以需要手動處理）
                         const [year, month, day] = localDate.split('-').map(Number);
                         const [hour, minute] = document.getElementById('customExpiry').value.split('T')[1].split(':').map(Number);
                         expiryDate = new Date(year, month-1, day, hour, minute);
@@ -209,7 +209,7 @@ async function serveFrontend() {
         const formData = {
             url: document.getElementById('url').value,
             slug: document.getElementById('slug').value,
-            expiry: expiryDate ? expiryDate.toISOString() : null, // 统一传递 ISO 字符串
+            expiry: expiryDate ? expiryDate.toISOString() : null, // 統一傳遞 ISO 字串
             password: document.getElementById('password').value,
             maxVisits: document.getElementById('maxVisits').value,
             token: token
@@ -229,14 +229,14 @@ async function serveFrontend() {
           resultDiv.innerHTML = \`
             <div class="p-4 bg-green-50 rounded-lg">
               <p class="text-green-800 font-medium mb-2">
-                短链接生成成功！
+                短鏈接生成成功！
               </p>
               <div class="flex items-center gap-2">
                 <input type="text" value="\${data.shortened}" readonly
                   class="flex-1 p-2 border border-gray-300 rounded bg-white">
                 <button onclick="copyToClipboard(this, '\${data.shortened}')"
                   class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">
-                  复制
+                  複製
                 </button>
               </div>
             </div>
@@ -255,7 +255,7 @@ async function serveFrontend() {
       } catch (error) {
         resultDiv.innerHTML = \`
           <div class="p-4 bg-red-50 rounded-lg">
-            <p class="text-red-800">生成短链接时发生错误，请重试</p>
+            <p class="text-red-800">生成短鏈接時發生錯誤，請重試</p>
           </div>
         \`;
         if (typeof turnstile !== 'undefined') {
@@ -263,9 +263,9 @@ async function serveFrontend() {
         }
       }
       
-      // 恢复提交按钮状态
+      // 恢復提交按鈕狀態
       submitButton.disabled = false;
-      submitButton.textContent = '生成短链接';
+      submitButton.textContent = '生成短網址';
     });
 
     document.getElementById('expiry').addEventListener('change', function() {
@@ -280,7 +280,7 @@ async function serveFrontend() {
     function copyToClipboard(button, text) {
       navigator.clipboard.writeText(text).then(() => {
         const originalText = button.textContent;
-        button.textContent = '已复制!';
+        button.textContent = '已複製!';
         button.classList.add('bg-green-500', 'hover:bg-green-600');
         
         setTimeout(() => {
@@ -289,9 +289,9 @@ async function serveFrontend() {
           button.classList.add('bg-blue-500', 'hover:bg-blue-600');
         }, 2000);
       }).catch(() => {
-        button.textContent = '复制失败';
+        button.textContent = '複製失敗';
         setTimeout(() => {
-          button.textContent = '复制';
+          button.textContent = '複製';
         }, 2000);
       });
     }
@@ -313,7 +313,7 @@ async function handleAPIRequest(request) {
 
     if (pathname === "/api/shorten") {
       if (request.method !== "POST") {
-        return new Response(JSON.stringify({ error: "请求方法不允许" }), { 
+        return new Response(JSON.stringify({ error: "請求方法不允許" }), { 
           status: 405,
           headers: { 
             "Content-Type": "application/json",
@@ -324,7 +324,7 @@ async function handleAPIRequest(request) {
 
       const { url, slug, expiry, password, maxVisits, token } = await request.json();
       if (!url) {
-        return new Response(JSON.stringify({ error: "请输入链接地址" }), {
+        return new Response(JSON.stringify({ error: "請輸入鏈接位址" }), {
           status: 400,
           headers: { "Content-Type": "application/json" },
         });
@@ -334,69 +334,69 @@ async function handleAPIRequest(request) {
       try {
         new URL(url);
       } catch {
-        return new Response(JSON.stringify({ error: "链接格式无效" }), {
+        return new Response(JSON.stringify({ error: "鏈接格式無效" }), {
           status: 400,
           headers: { "Content-Type": "application/json" },
         });
       }
 
-      // 添加最大访问次数验证
+      // 添加最大訪問次數驗證
       if (maxVisits && (parseInt(maxVisits) <= 0 || isNaN(parseInt(maxVisits)))) {
-        return new Response(JSON.stringify({ error: "最大访问次数必须大于0" }), {
+        return new Response(JSON.stringify({ error: "最大訪問次數必須大於0" }), {
           status: 400,
           headers: { "Content-Type": "application/json" },
         });
       }
 
-      // 添加自定义有效期验证
+      // 添加自訂有效期驗證
       if (expiry) {
         const expiryDate = new Date(expiry);
         const now = new Date();
         if (expiryDate <= now) {
-          return new Response(JSON.stringify({ error: "有效期必须大于当前时间" }), {
+          return new Response(JSON.stringify({ error: "有效期必須大於目前時間" }), {
             status: 400,
             headers: { "Content-Type": "application/json" },
           });
         }
       }
 
-      // 生成或使用自定义短链，并确保唯一性
+      // 生成或使用自訂短鏈，並確保唯一性
       let shortSlug;
       if (slug) {
-        // 自定义短链验证
+        // 自訂短鏈驗證
         if (slug.length < 3) {
-          return new Response(JSON.stringify({ error: "自定义链接至少需要3个字符" }), {
+          return new Response(JSON.stringify({ error: "自訂鏈接至少需要3個字元" }), {
             status: 400,
             headers: { "Content-Type": "application/json" },
           });
         }
         if (!/^[a-zA-Z0-9-_]+$/.test(slug)) {
-          return new Response(JSON.stringify({ error: "自定义链接格式无效，只能使用字母、数字、横线和下划线" }), {
+          return new Response(JSON.stringify({ error: "自訂鏈接格式無效，只能使用字母、數字、橫線和底線" }), {
             status: 400,
             headers: { "Content-Type": "application/json" },
           });
         }
-        // 检查是否存在
+        // 檢查是否存在
         const existing = await URL_SHORT_KV.get(slug);
         if (existing) {
-          return new Response(JSON.stringify({ error: "该自定义链接已被使用" }), {
+          return new Response(JSON.stringify({ error: "該自訂鏈接已被使用" }), {
             status: 400,
             headers: { "Content-Type": "application/json" },
           });
         }
         shortSlug = slug;
       } else {
-        // 生成唯一短链，最多尝试10次
+        // 生成唯一短鏈，最多嘗試10次
         shortSlug = await generateUniqueSlug();
         if (!shortSlug) {
-          return new Response(JSON.stringify({ error: "系统繁忙，请稍后重试" }), {
+          return new Response(JSON.stringify({ error: "系統繁忙，請稍後重試" }), {
             status: 500,
             headers: { "Content-Type": "application/json" },
           });
         }
       }
 
-      // 存储数据
+      // 存儲數據
       const expiryTimestamp = expiry ? new Date(expiry).getTime() : null;
       await URL_SHORT_KV.put(shortSlug, JSON.stringify({ 
         url, 
@@ -416,7 +416,7 @@ async function handleAPIRequest(request) {
 
     if (pathname.startsWith('/api/verify/')) {
       if (request.method !== "POST") {
-        return new Response(JSON.stringify({ error: "请求方法不允许" }), { 
+        return new Response(JSON.stringify({ error: "請求方法不允許" }), { 
           status: 405,
           headers: { 
             "Content-Type": "application/json",
@@ -429,7 +429,7 @@ async function handleAPIRequest(request) {
       const record = await URL_SHORT_KV.get(slug);
       
       if (!record) {
-        return new Response(JSON.stringify({ error: "链接不存在" }), {
+        return new Response(JSON.stringify({ error: "鏈接不存在" }), {
           status: 404,
           headers: { "Content-Type": "application/json" }
         });
@@ -439,10 +439,10 @@ async function handleAPIRequest(request) {
       const { password: correctPassword, url, maxVisits, visits = 0 } = data;
       const { password: inputPassword, token } = await request.json();
 
-      // 验证 Turnstile token
+      // 驗證 Turnstile token
       if (TURNSTILE_SITE_KEY && TURNSTILE_SECRET) {
         if (!token) {
-          return new Response(JSON.stringify({ error: "请完成人机验证" }), {
+          return new Response(JSON.stringify({ error: "請完成人機驗證" }), {
             status: 400,
             headers: { "Content-Type": "application/json" },
           });
@@ -450,32 +450,32 @@ async function handleAPIRequest(request) {
         
         const tokenValidation = await validateTurnstileToken(token);
         if (!tokenValidation.success) {
-          return new Response(JSON.stringify({ error: "人机验证失败" }), {
+          return new Response(JSON.stringify({ error: "人機驗證失敗" }), {
             status: 400,
             headers: { "Content-Type": "application/json" },
           });
         }
       }
 
-      // 检查访问次数是否已达上限
+      // 檢查訪問次數是否已達上限
       if (maxVisits && visits >= maxVisits) {
-        // 可选的：立即删除记录
+        // 可選的：立即刪除記錄
         await URL_SHORT_KV.delete(slug);
-        return new Response(JSON.stringify({ error: "链接访问次数已达上限" }), {
+        return new Response(JSON.stringify({ error: "鏈接訪問次數已達上限" }), {
           status: 410,
           headers: { "Content-Type": "application/json" }
         });
       }
 
       if (inputPassword === correctPassword) {
-        // 密码正确，更新访问次数
+        // 密碼正確，更新訪問次數
         const newVisits = visits + 1;
         await URL_SHORT_KV.put(slug, JSON.stringify({
           ...data,
           visits: newVisits
         }));
 
-        // 如果达到上限，立即删除
+        // 如果達到上限，立即刪除
         if (maxVisits && newVisits >= maxVisits) {
           await URL_SHORT_KV.delete(slug);
         }
@@ -489,20 +489,20 @@ async function handleAPIRequest(request) {
       } else {
         return new Response(JSON.stringify({ 
           success: false,
-          error: "密码错误"
+          error: "密碼錯誤"
         }), {
           headers: { "Content-Type": "application/json" }
         });
       }
     }
 
-    return new Response(JSON.stringify({ error: "页面不存在" }), { 
+    return new Response(JSON.stringify({ error: "頁面不存在" }), { 
       status: 404,
       headers: { "Content-Type": "application/json" }
     });
   } catch (error) {
     console.error('API Error:', error);
-    return new Response(JSON.stringify({ error: "服务器内部错误" }), {
+    return new Response(JSON.stringify({ error: "伺服器內部錯誤" }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });
@@ -515,7 +515,7 @@ async function handleRedirect(pathname) {
     const record = await URL_SHORT_KV.get(slug);
 
     if (!record) {
-      return new Response("链接不存在", { 
+      return new Response("鏈接不存在", { 
         status: 404,
         headers: { "Content-Type": "text/plain; charset=utf-8" }
       });
@@ -526,7 +526,7 @@ async function handleRedirect(pathname) {
 
     if (expiry && Date.now() > expiry) {
       await URL_SHORT_KV.delete(slug);
-      return new Response("链接已过期", { 
+      return new Response("鏈接已過期", { 
         status: 410,
         headers: { "Content-Type": "text/plain; charset=utf-8" }
       });
@@ -534,17 +534,17 @@ async function handleRedirect(pathname) {
 
     if (maxVisits && visits >= maxVisits) {
       await URL_SHORT_KV.delete(slug);
-      return new Response("链接访问次数已达上限", { 
+      return new Response("鏈接訪問次數已達上限", { 
         status: 410,
         headers: { "Content-Type": "text/plain; charset=utf-8" }
       });
     }
 
-    // 只在没有密码保护时更新访问次数
+    // 只在沒有密碼保護時更新訪問次數
     if (maxVisits && !password) {
       data.visits = visits + 1;
       await URL_SHORT_KV.put(slug, JSON.stringify(data));
-      // 如果达到上限，立即删除
+      // 如果達到上限，立即刪除
       if (data.visits >= maxVisits) {
         await URL_SHORT_KV.delete(slug);
       }
@@ -560,7 +560,7 @@ async function handleRedirect(pathname) {
       <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>密码保护链接</title>
+      <title>密碼保護鏈接</title>
       <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
       <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔒</text></svg>">
       ${turnstileScript}
@@ -568,10 +568,10 @@ async function handleRedirect(pathname) {
       <body class="bg-gray-100">
         <main class="container mx-auto p-4 max-w-md min-h-screen flex items-center justify-center">
           <div class="bg-white rounded-lg shadow-md p-6 w-full">
-            <h1 class="text-2xl font-bold mb-6 text-center text-gray-800">密码保护链接</h1>
+            <h1 class="text-2xl font-bold mb-6 text-center text-gray-800">密碼保護鏈接</h1>
             <form id="password-form" class="space-y-4">
               <div>
-                <label for="password" class="block text-sm font-medium text-gray-700 mb-1">请输入访问码：</label>
+                <label for="password" class="block text-sm font-medium text-gray-700 mb-1">請輸入訪問碼：</label>
                 <input id="password" type="password" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
               </div>
               <div class="flex justify-center">
@@ -580,7 +580,7 @@ async function handleRedirect(pathname) {
                     ''}
               </div>
               <button type="submit" class="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                访问链接
+                訪問鏈接
               </button>
             </form>
             <div id="error" class="mt-4 text-red-500 text-center"></div>
@@ -594,7 +594,7 @@ async function handleRedirect(pathname) {
             const errorDiv = document.getElementById('error');
             
             submitButton.disabled = true;
-            submitButton.textContent = '验证中...';
+            submitButton.textContent = '驗證中...';
             errorDiv.textContent = '';
             
             let token = null;
@@ -604,9 +604,9 @@ async function handleRedirect(pathname) {
               console.error('Turnstile error:', e);
             }
             if (TURNSTILE_SITE_KEY && !token) {
-              errorDiv.textContent = "请完成人机验证";
+              errorDiv.textContent = "請完成人機驗證";
               submitButton.disabled = false;
-              submitButton.textContent = '访问链接';
+              submitButton.textContent = '訪問鏈接';
               return;
             }
             
@@ -627,20 +627,20 @@ async function handleRedirect(pathname) {
               if (data.success) {
                 window.location.href = data.url;
               } else {
-                errorDiv.textContent = data.error || "密码错误";
+                errorDiv.textContent = data.error || "密碼錯誤";
                 // 重置 Turnstile
                 if (typeof turnstile !== 'undefined') {
                   turnstile.reset();
                 }
               }
             } catch (error) {
-              errorDiv.textContent = "发生错误，请重试";
+              errorDiv.textContent = "發生錯誤，請重試";
               if (typeof turnstile !== 'undefined') {
                 turnstile.reset();
               }
             } finally {
               submitButton.disabled = false;
-              submitButton.textContent = '访问链接';
+              submitButton.textContent = '訪問鏈接';
             }
           });
         </script>
@@ -658,7 +658,7 @@ async function handleRedirect(pathname) {
     return Response.redirect(url, 302);
   } catch (error) {
     console.error('Redirect Error:', error);
-    return new Response("服务器内部错误", { 
+    return new Response("伺服器內部錯誤", { 
       status: 500,
       headers: { "Content-Type": "text/plain; charset=utf-8" }
     });
@@ -666,8 +666,8 @@ async function handleRedirect(pathname) {
 }
 
 /**
- * 生成随机短链，确保唯一性
- * 最多尝试 MAX_ATTEMPTS 次，若失败返回 null
+ * 生成隨機短鏈，確保唯一性
+ * 最多嘗試 MAX_ATTEMPTS 次，若失敗返回 null
  */
 async function generateUniqueSlug(length = 6, maxAttempts = 10) {
   const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -701,7 +701,7 @@ async function validateTurnstileToken(token) {
     console.error('Turnstile validation error:', error);
     return { 
       success: false,
-      error: ['验证服务器错误']
+      error: ['驗證伺服器錯誤']
     };
   }
 }
