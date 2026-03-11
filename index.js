@@ -1,6 +1,6 @@
 // Cloudflare Worker
 // 使用 Cloudflare KV 存儲短鏈接數據
-// 綁定變量：URL_SHORT_KV, TURNSTILE_SITE_KEY, TURNSTILE_SECRET
+// 綁定變量：URL_SHORT_KV
 
 addEventListener("fetch", (event) => {
   event.respondWith(handleRequest(event.request));
@@ -35,10 +35,6 @@ async function handleRequest(request) {
 }
 
 async function serveFrontend() {
-  const turnstileScript = TURNSTILE_SITE_KEY ? 
-    '<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>' : 
-    '';
-  
   const frontendHTML = `<!DOCTYPE html>
 <html lang="zh">
 <head>
@@ -47,7 +43,6 @@ async function serveFrontend() {
     <title>簡約短網址服務</title>
     <link href="https://fastly.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔗</text></svg>">
-    ${turnstileScript}
 </head>
 <body class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
     <main class="container mx-auto p-6 max-w-2xl">
@@ -132,12 +127,6 @@ async function serveFrontend() {
                     </div>
                 </div>
                 
-                <div class="flex justify-center">
-                    ${TURNSTILE_SITE_KEY ? 
-                        '<div class="cf-turnstile" data-sitekey="' + TURNSTILE_SITE_KEY + '"></div>' : 
-                        ''}
-                </div>
-                
                 <button type="submit" 
                     class="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-3 px-6 rounded-lg font-medium hover:from-blue-600 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transform hover:-translate-y-0.5 transition duration-200">
                     生成短網址
@@ -151,20 +140,6 @@ async function serveFrontend() {
     <script>
     document.getElementById('shorten-form').addEventListener('submit', async (e) => {
       e.preventDefault();
-      
-      let token;
-      try {
-        // 確保 turnstile 物件存在
-        token = typeof turnstile !== 'undefined' ? turnstile.getResponse() : null;
-        if (TURNSTILE_SITE_KEY && !token) {
-          document.getElementById('result').innerHTML = \`<div class="p-4 bg-red-50 rounded-lg"><p class="text-red-800">請完成人機驗證</p></div>\`;
-          return;
-        }
-      } catch (error) {
-        console.error('Turnstile error:', error);
-        document.getElementById('result').innerHTML = \`<div class="p-4 bg-red-50 rounded-lg"><p class="text-red-800">人機驗證載入失敗，請重新整理頁面重試</p></div>\`;
-        return;
-      }
       
       const submitButton = e.target.querySelector('button[type="submit"]');
       const resultDiv = document.getElementById('result');
@@ -194,10 +169,9 @@ async function serveFrontend() {
                     expiryDate = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
                     break;
                 case 'custom':
-                    // 將本地時間字串轉換為 ISO 字串（包含時區偏移）
+                    // 將本地時間字串轉換為 Date 物件
                     const localDate = document.getElementById('customExpiry').value;
                     if (localDate) {
-                        // 建構本地時間的 Date 物件（注意：new Date(localDate) 會被解析為 UTC，所以需要手動處理）
                         const [year, month, day] = localDate.split('-').map(Number);
                         const [hour, minute] = document.getElementById('customExpiry').value.split('T')[1].split(':').map(Number);
                         expiryDate = new Date(year, month-1, day, hour, minute);
@@ -209,17 +183,14 @@ async function serveFrontend() {
         const formData = {
             url: document.getElementById('url').value,
             slug: document.getElementById('slug').value,
-            expiry: expiryDate ? expiryDate.toISOString() : null, // 統一傳遞 ISO 字串
+            expiry: expiryDate ? expiryDate.toISOString() : null,
             password: document.getElementById('password').value,
-            maxVisits: document.getElementById('maxVisits').value,
-            token: token
+            maxVisits: document.getElementById('maxVisits').value
         };
         
         const response = await fetch('/api/shorten', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(formData)
         });
         
@@ -228,39 +199,20 @@ async function serveFrontend() {
         if (response.ok) {
           resultDiv.innerHTML = \`
             <div class="p-4 bg-green-50 rounded-lg">
-              <p class="text-green-800 font-medium mb-2">
-                短鏈接生成成功！
-              </p>
+              <p class="text-green-800 font-medium mb-2">短鏈接生成成功！</p>
               <div class="flex items-center gap-2">
                 <input type="text" value="\${data.shortened}" readonly
                   class="flex-1 p-2 border border-gray-300 rounded bg-white">
                 <button onclick="copyToClipboard(this, '\${data.shortened}')"
-                  class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">
-                  複製
-                </button>
+                  class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">複製</button>
               </div>
             </div>
           \`;
         } else {
-          resultDiv.innerHTML = \`
-            <div class="p-4 bg-red-50 rounded-lg">
-              <p class="text-red-800">\${data.error}</p>
-            </div>
-          \`;
-          // 重置 Turnstile
-          if (typeof turnstile !== 'undefined') {
-            turnstile.reset();
-          }
+          resultDiv.innerHTML = \`<div class="p-4 bg-red-50 rounded-lg"><p class="text-red-800">\${data.error}</p></div>\`;
         }
       } catch (error) {
-        resultDiv.innerHTML = \`
-          <div class="p-4 bg-red-50 rounded-lg">
-            <p class="text-red-800">生成短鏈接時發生錯誤，請重試</p>
-          </div>
-        \`;
-        if (typeof turnstile !== 'undefined') {
-          turnstile.reset();
-        }
+        resultDiv.innerHTML = '<div class="p-4 bg-red-50 rounded-lg"><p class="text-red-800">生成短鏈接時發生錯誤，請重試</p></div>';
       }
       
       // 恢復提交按鈕狀態
@@ -270,11 +222,7 @@ async function serveFrontend() {
 
     document.getElementById('expiry').addEventListener('change', function() {
         const customExpiryInput = document.getElementById('customExpiry');
-        if (this.value === 'custom') {
-            customExpiryInput.classList.remove('hidden');
-        } else {
-            customExpiryInput.classList.add('hidden');
-        }
+        customExpiryInput.classList.toggle('hidden', this.value !== 'custom');
     });
 
     function copyToClipboard(button, text) {
@@ -282,7 +230,6 @@ async function serveFrontend() {
         const originalText = button.textContent;
         button.textContent = '已複製!';
         button.classList.add('bg-green-500', 'hover:bg-green-600');
-        
         setTimeout(() => {
           button.textContent = originalText;
           button.classList.remove('bg-green-500', 'hover:bg-green-600');
@@ -322,7 +269,7 @@ async function handleAPIRequest(request) {
         });
       }
 
-      const { url, slug, expiry, password, maxVisits, token } = await request.json();
+      const { url, slug, expiry, password, maxVisits } = await request.json();
       if (!url) {
         return new Response(JSON.stringify({ error: "請輸入鏈接位址" }), {
           status: 400,
@@ -437,29 +384,10 @@ async function handleAPIRequest(request) {
 
       const data = JSON.parse(record);
       const { password: correctPassword, url, maxVisits, visits = 0 } = data;
-      const { password: inputPassword, token } = await request.json();
-
-      // 驗證 Turnstile token
-      if (TURNSTILE_SITE_KEY && TURNSTILE_SECRET) {
-        if (!token) {
-          return new Response(JSON.stringify({ error: "請完成人機驗證" }), {
-            status: 400,
-            headers: { "Content-Type": "application/json" },
-          });
-        }
-        
-        const tokenValidation = await validateTurnstileToken(token);
-        if (!tokenValidation.success) {
-          return new Response(JSON.stringify({ error: "人機驗證失敗" }), {
-            status: 400,
-            headers: { "Content-Type": "application/json" },
-          });
-        }
-      }
+      const { password: inputPassword } = await request.json();
 
       // 檢查訪問次數是否已達上限
       if (maxVisits && visits >= maxVisits) {
-        // 可選的：立即刪除記錄
         await URL_SHORT_KV.delete(slug);
         return new Response(JSON.stringify({ error: "鏈接訪問次數已達上限" }), {
           status: 410,
@@ -551,10 +479,6 @@ async function handleRedirect(pathname) {
     }
 
     if (password) {
-      const turnstileScript = TURNSTILE_SITE_KEY ? 
-        '<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>' : 
-        '';
-      
       const frontendHTML = `<!DOCTYPE html>
       <html lang="zh">
       <head>
@@ -563,7 +487,6 @@ async function handleRedirect(pathname) {
       <title>密碼保護鏈接</title>
       <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
       <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔒</text></svg>">
-      ${turnstileScript}
       </head>
       <body class="bg-gray-100">
         <main class="container mx-auto p-4 max-w-md min-h-screen flex items-center justify-center">
@@ -573,11 +496,6 @@ async function handleRedirect(pathname) {
               <div>
                 <label for="password" class="block text-sm font-medium text-gray-700 mb-1">請輸入訪問碼：</label>
                 <input id="password" type="password" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
-              </div>
-              <div class="flex justify-center">
-                ${TURNSTILE_SITE_KEY ? 
-                    '<div class="cf-turnstile" data-sitekey="' + TURNSTILE_SITE_KEY + '"></div>' : 
-                    ''}
               </div>
               <button type="submit" class="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
                 訪問鏈接
@@ -597,29 +515,11 @@ async function handleRedirect(pathname) {
             submitButton.textContent = '驗證中...';
             errorDiv.textContent = '';
             
-            let token = null;
-            try {
-              token = typeof turnstile !== 'undefined' ? turnstile.getResponse() : null;
-            } catch (e) {
-              console.error('Turnstile error:', e);
-            }
-            if (TURNSTILE_SITE_KEY && !token) {
-              errorDiv.textContent = "請完成人機驗證";
-              submitButton.disabled = false;
-              submitButton.textContent = '訪問鏈接';
-              return;
-            }
-            
             try {
               const response = await fetch('/api/verify/${slug}', {
                 method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ 
-                  password: inputPassword,
-                  token: token
-                })
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ password: inputPassword })
               });
               
               const data = await response.json();
@@ -628,16 +528,9 @@ async function handleRedirect(pathname) {
                 window.location.href = data.url;
               } else {
                 errorDiv.textContent = data.error || "密碼錯誤";
-                // 重置 Turnstile
-                if (typeof turnstile !== 'undefined') {
-                  turnstile.reset();
-                }
               }
             } catch (error) {
               errorDiv.textContent = "發生錯誤，請重試";
-              if (typeof turnstile !== 'undefined') {
-                turnstile.reset();
-              }
             } finally {
               submitButton.disabled = false;
               submitButton.textContent = '訪問鏈接';
@@ -679,29 +572,4 @@ async function generateUniqueSlug(length = 6, maxAttempts = 10) {
     }
   }
   return null;
-}
-
-async function validateTurnstileToken(token) {
-  try {
-    const formData = new FormData();
-    formData.append('secret', TURNSTILE_SECRET);
-    formData.append('response', token);
-
-    const response = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
-      method: 'POST',
-      body: formData
-    });
-
-    const data = await response.json();
-    return { 
-      success: data.success,
-      error: data['error-codes']
-    };
-  } catch (error) {
-    console.error('Turnstile validation error:', error);
-    return { 
-      success: false,
-      error: ['驗證伺服器錯誤']
-    };
-  }
 }
