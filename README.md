@@ -1,6 +1,6 @@
 # 简约短链接生成器
 
-https://cdn.ugreen.hidns.co  演示网站，请自行部署
+https://cdn.ifanr.dedyn.io  演示网站，请自行部署
 
 一个基于 Cloudflare Workers 和 KV 存储的短链接生成服务。
 因为[Cloudflare](https://www.cloudflare.com)的免费套餐有限制，所以不提供预览地址，请自行前往[cloudflare Work](https://dash.cloudflare.com)部署。  
